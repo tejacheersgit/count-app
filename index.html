@@ -1,130 +1,85 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Counter 1→108</title>
-  <style>
-    :root{--bg:#0f172a;--card:#0b1220;--accent:#60a5fa;--muted:#94a3b8}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071029 0%, #071a2a 100%);color:#e6eef8}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:28px;width:360px;box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-    h1{margin:0 0 12px;font-size:20px;color:var(--accent)}
-    .display{font-size:92px;line-height:1;text-align:center;font-weight:700;padding:8px 0;color:#fff}
-    .controls{display:flex;gap:8px;justify-content:center;margin-top:12px}
-    button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 14px;border-radius:10px;color:var(--muted);cursor:pointer;font-weight:600}
-    button.primary{background:var(--accent);color:#012040;border:none}
-    button:active{transform:translateY(1px)}
-    .small{font-size:13px;padding:8px 10px}
-    .row{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px}
-    .input{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#dbeafe}
-    .muted{color:var(--muted);font-size:13px}
-    footer{margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Counter 1→108 (Beep + Vibration)</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  background: #0b1220;
+  color: #eaeaea;
+  text-align: center;
+  padding-top: 60px;
+}
+#num {
+  font-size: 100px;
+  margin: 20px 0;
+}
+button {
+  font-size: 20px;
+  margin: 5px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Counter — 1 to 108</h1>
-      <div id="display" class="display">1</div>
-
-      <div class="controls">
-        <button id="dec" class="small">−</button>
-        <button id="reset" class="small">Reset</button>
-        <button id="inc" class="small">＋</button>
-      </div>
-
-      <div class="row" style="margin-top:16px;">
-        <div style="flex:1;margin-right:8px;">
-          <input id="goto" class="input" type="number" min="1" max="108" placeholder="Jump to number (1-108)" />
-        </div>
-        <div>
-          <button id="go" class="small">Go</button>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="muted">Autoplay speed (ms)</div>
-        <div style="width:120px;display:flex;gap:8px;align-items:center;">
-          <input id="speed" class="input" type="number" value="500" min="50" step="50" />
-          <button id="play" class="small primary">Play</button>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
-        <button id="stepBack" class="small">-10</button>
-        <button id="stepFwd" class="small">+10</button>
-      </div>
-
-      <footer>Use ←/→ to step, Space to toggle play. Max = 108</footer>
-    </div>
-  </div>
-
-  <script>
-    (function(){
-      const MAX = 108, MIN = 1
-      const display = document.getElementById('display')
-      const inc = document.getElementById('inc')
-      const dec = document.getElementById('dec')
-      const reset = document.getElementById('reset')
-      const goBtn = document.getElementById('go')
-      const goto = document.getElementById('goto')
-      const playBtn = document.getElementById('play')
-      const speedInput = document.getElementById('speed')
-      const stepBack = document.getElementById('stepBack')
-      const stepFwd = document.getElementById('stepFwd')
-
-      let value = 1
-      let timer = null
-
-      function render(){
-        display.textContent = value
-      }
-
-      function setValue(v){
-        const n = Math.max(MIN, Math.min(MAX, Math.floor(v)))
-        value = n
-        render()
-      }
-
-      inc.addEventListener('click', ()=> setValue(value + 1))
-      dec.addEventListener('click', ()=> setValue(value - 1))
-      reset.addEventListener('click', ()=> setValue(1))
-      goBtn.addEventListener('click', ()=> {
-        const v = Number(goto.value)
-        if (!isFinite(v)) return alert('Enter a number between 1 and 108')
-        setValue(v)
-      })
-
-      stepBack.addEventListener('click', ()=> setValue(value - 10))
-      stepFwd.addEventListener('click', ()=> setValue(value + 10))
-
-      function start(){
-        if (timer) return
-        playBtn.textContent = 'Pause'
-        timer = setInterval(()=>{
-          if (value >= MAX){ stop(); return }
-          setValue(value + 1)
-        }, Math.max(50, Number(speedInput.value) || 500))
-      }
-      function stop(){
-        if(!timer) return
-        clearInterval(timer); timer = null; playBtn.textContent = 'Play'
-      }
-      playBtn.addEventListener('click', ()=> {
-        if(timer) stop(); else start()
-      })
-
-      // keyboard shortcuts
-      window.addEventListener('keydown', (e)=>{
-        if (e.key === 'ArrowRight'){ setValue(value + 1); }
-        else if (e.key === 'ArrowLeft'){ setValue(value - 1); }
-        else if (e.code === 'Space'){ e.preventDefault(); if(timer) stop(); else start(); }
-      })
-
-      // init
-      render()
-    })()
-  </script>
+<h1>Counter 1–108</h1>
+<div id="num">1</div>
+<div>
+  <button id="dec">-</button>
+  <button id="reset">Reset</button>
+  <button id="inc">+</button>
+</div>
+<p style="color:#94a3b8;font-size:14px;">Tap any button once to enable sound & vibration</p>
+<script>
+let n = 1;
+const num = document.getElementById("num");
+const inc = document.getElementById("inc");
+const dec = document.getElementById("dec");
+const reset = document.getElementById("reset");
+let audioCtx;
+function beep() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.frequency.value = 880;
+  gain.gain.value = 0.1;
+  osc.start();
+  setTimeout(() => { osc.stop(); }, 100);
+}
+function vibrate() {
+  if (navigator.vibrate) {
+    navigator.vibrate(100);
+  } else {
+    console.log("Vibration not supported");
+  }
+}
+function feedback() {
+  beep();
+  vibrate();
+}
+function setNum(v) {
+  if (v < 1) v = 1;
+  if (v > 108) v = 108;
+  n = v;
+  num.textContent = n;
+  feedback();
+}
+inc.onclick = () => setNum(n + 1);
+dec.onclick = () => setNum(n - 1);
+reset.onclick = () => setNum(1);
+document.addEventListener('touchstart', () => {
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}, {once:true});
+</script>
 </body>
 </html>
